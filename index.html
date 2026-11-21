@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lion Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0a0a0a;--blue:#1448ff;--white:#fff;--soft:#f2f4f8;--line:#dde1e8;--mute:#5b6370;--err:#c0281e;--ok:#0a7a45}
+*{box-sizing:border-box}
+body{margin:0;background:var(--white);color:var(--ink);font-family:'Barlow',system-ui,sans-serif;line-height:1.6}
+h1,h2,h3,.disp{font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.01em}
+button{font:inherit;cursor:pointer}
+header{background:var(--ink);color:var(--white);position:sticky;top:0;z-index:5}
+.bar{max-width:1120px;margin:auto;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{font-size:1.9rem;color:var(--white);text-decoration:none;margin-right:auto}
+.logo span{color:var(--blue)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{color:#c9ced8;text-decoration:none;padding:4px 14px;border-radius:999px;font-weight:600}
+nav a[aria-current=page]{background:var(--blue);color:var(--white)}
+.cartbtn{background:var(--white);color:var(--ink);border:0;border-radius:8px;padding:5px 16px;font-weight:600}
+.hero{background:var(--ink);color:var(--white);padding:48px 20px 56px;border-bottom:6px solid var(--blue)}
+.hero div{max-width:1120px;margin:auto}
+.hero h1{margin:0;font-size:clamp(2.8rem,9vw,6rem);line-height:1}
+.hero p{margin:10px 0 0;color:#c9ced8;max-width:46ch}
+.head{max-width:1120px;margin:auto;padding:36px 20px 8px}
+.head h1{margin:0;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1}
+.head p{margin:6px 0 0;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;max-width:1120px;margin:0 auto;padding:24px 20px 56px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.img{position:relative;aspect-ratio:1/1;background:var(--soft);display:grid;place-items:center}
+.img img{width:100%;height:100%;object-fit:cover;display:block}
+.img .ph{font-family:'Barlow Condensed';font-weight:800;font-size:1.6rem;color:#9aa3b2}
+.badge{position:absolute;top:10px;left:10px;background:var(--blue);color:var(--white);font-weight:700;padding:1px 10px;border-radius:6px}
+.body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.body h3{margin:0;font-size:1.3rem}
+.price{display:flex;gap:10px;align-items:baseline;font-weight:700}
+.price s{color:var(--mute);font-weight:400}
+select,input,textarea{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink)}
+.add{background:var(--ink);color:var(--white);border:0;border-radius:8px;padding:9px;font-weight:600}
+.add:hover{background:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(440px,100%);background:var(--white);z-index:10;transform:translateX(102%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:0 0 40px #0005}
+.drawer.open{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--ink);color:var(--white)}
+.dh h3{margin:0;font-size:1.5rem}
+.x{background:none;border:0;color:var(--white);font-size:1.7rem}
+.dbody{flex:1;overflow:auto;padding:14px 18px}
+.line{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:28px;height:28px;border-radius:50%;border:1px solid var(--ink);background:var(--white);font-weight:700}
+.sum{padding:5px 0;display:flex;justify-content:space-between}
+.sum.t{font-weight:700;font-size:1.15rem;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px}
+form{display:grid;gap:8px;margin-top:14px}
+.confirm{background:var(--blue);color:var(--white);border:0;border-radius:10px;padding:12px;font-weight:700;font-size:1.05rem}
+.confirm:disabled{opacity:.6}
+.msg{min-height:1.5em;font-weight:600}
+.msg.err{color:var(--err)}
+.done{text-align:center;padding:40px 10px;color:var(--ok)}
+.done h3{font-size:2rem;margin:0}
+.empty{color:var(--mute);text-align:center;padding:30px 0;grid-column:1/-1}
+.veil{position:fixed;inset:0;background:#0007;z-index:9;display:none}
+.veil.open{display:block}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+.badge.out{left:auto;right:10px;background:var(--ink)}
+.card.sold .img img,.card.sold .img .ph{filter:grayscale(1);opacity:.45}
+.low{color:var(--err);font-weight:600;font-size:.9rem}
+.add:disabled{background:#9aa3b2;cursor:not-allowed}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a class="logo disp" href="#/offers">LION<span>STORE</span></a>
+  <nav id="nav" aria-label="Pages"></nav>
+  <button class="cartbtn" id="openCart" aria-label="Open cart">Cart (<span id="count">0</span>)</button>
+</div></header>
+<div id="top"></div>
+<main class="grid" id="grid"></main>
+
+<div class="veil" id="veil"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="dh"><h3>Your Order</h3><button class="x" id="closeCart" aria-label="Close">×</button></div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+
+<script>
+// ===== Settings =====
+const API = 'PASTE_APPS_SCRIPT_URL_HERE'; // Apps Script Web app URL
+const SHIPPING = 80;                      // must match CFG.SHIPPING in Code.gs
+const PAGES = [
+  {id:'offers',   label:'Exclusive Offers'},
+  {id:'copy',     label:'Copy',      cat:'Copy'},
+  {id:'mirror',   label:'Mirror',    cat:'Mirror'},
+  {id:'high-copy',label:'High Copy', cat:'High Copy'}
+];
+// Demo products (shown until the API URL is set)
+let products = [
+  {code:'C001',name:'Sample Model 1',category:'Copy',price:550,oldPrice:650,sizes:['40','41','42','43'],offer:true},
+  {code:'M001',name:'Sample Model 2',category:'Mirror',price:950,oldPrice:0,sizes:['40','41','42','43','44'],offer:false},
+  {code:'H001',name:'Sample Model 3',category:'High Copy',price:1050,oldPrice:1250,sizes:['41','42','43'],offer:true}
+];
+let cart = [], orderDone = null, note = '';
+try { cart = JSON.parse(localStorage.getItem('cart') || '[]'); } catch (e) {}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => Number(n).toLocaleString('en-US') + ' EGP';
+const save = () => { try { localStorage.setItem('cart', JSON.stringify(cart)); } catch (e) {} };
+
+function card(p) {
+  const off = p.oldPrice > p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+  const sold = p.stock <= 0, low = p.stock > 0 && p.stock <= 3;
+  return `<article class="card${sold ? ' sold' : ''}">
+    <div class="img">
+      ${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" referrerpolicy="no-referrer">` : '<div class="ph">LION STORE</div>'}
+      ${sold ? '<span class="badge out">Out of stock</span>' : off ? `<span class="badge">-${off}%</span>` : ''}
+    </div>
+    <div class="body">
+      <h3>${esc(p.name)}</h3>
+      <div class="price"><span>${money(p.price)}</span>${off ? `<s>${money(p.oldPrice)}</s>` : ''}</div>
+      ${low ? `<div class="low">Only ${p.stock} left</div>` : ''}<select aria-label="Size for ${esc(p.name)}" id="s-${esc(p.code)}" ${sold ? 'disabled' : ''}>${p.sizes.map(s => `<option value="${esc(s.size)}" ${s.qty ? '' : 'disabled'}>${esc(s.size)}${s.qty ? (s.qty <= 3 ? ' (' + s.qty + ' left)' : '') : ' (sold out)'}</option>`).join('')}</select>
+      <button class="add" data-add="${esc(p.code)}" ${sold ? 'disabled' : ''}>${sold ? 'Out of stock' : 'Add to cart'}</button>
+    </div></article>`;
+}
+
+function route() {
+  const id = location.hash.replace('#/', '') || 'offers';
+  const page = PAGES.find(p => p.id === id) || PAGES[0];
+  $('nav').innerHTML = PAGES.map(p => `<a href="#/${p.id}" ${p.id === page.id ? 'aria-current="page"' : ''}>${p.label}</a>`).join('');
+  const list = page.cat ? products.filter(p => p.category === page.cat) : products.filter(p => p.offer);
+  $('top').innerHTML = page.cat
+    ? `<section class="head"><h1>${esc(page.label)}</h1><p>${list.length} model${list.length === 1 ? '' : 's'} available</p></section>`
+    : `<section class="hero"><div><h1>Exclusive Offers</h1><p>Limited prices on selected models. Pick your size and order, pay cash on delivery.</p></div></section>`;
+  $('grid').innerHTML = list.length ? list.map(card).join('') : '<p class="empty">Nothing here right now. Check back soon.</p>';
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+function renderCart() {
+  $('count').textContent = cart.reduce((a, i) => a + i.qty, 0);
+  const b = $('dbody');
+  if (orderDone) {
+    b.innerHTML = `<div class="done"><h3>Order received</h3><p>Order number: <b>${esc(orderDone)}</b><br>We'll call you to confirm it.</p><button class="add" id="again">Done</button></div>`;
+    return;
+  }
+  if (!cart.length) { b.innerHTML = '<p class="empty">Your cart is empty.</p>'; return; }
+  const sub = cart.reduce((a, i) => a + i.price * i.qty, 0);
+  b.innerHTML = (note ? `<p class="msg err">${esc(note)}</p>` : '') + cart.map((i, n) => `
+    <div class="line"><div><b>${esc(i.name)}</b><br><small>Size ${esc(i.size)} · ${money(i.price)}</small></div>
+      <div class="qty"><button data-q="${n}" data-d="-1" aria-label="Decrease">−</button><span>${i.qty}</span><button data-q="${n}" data-d="1" aria-label="Increase">+</button></div></div>`).join('') +
+    `<div class="sum"><span>Items</span><span>${money(sub)}</span></div>
+     <div class="sum"><span>Shipping</span><span>${money(SHIPPING)}</span></div>
+     <div class="sum t"><span>Total (cash on delivery)</span><span>${money(sub + SHIPPING)}</span></div>
+     <form id="f" novalidate>
+       <input name="name" placeholder="Full name" autocomplete="name" required>
+       <input name="phone" placeholder="Mobile number (01xxxxxxxxx)" inputmode="numeric" autocomplete="tel" required>
+       <input name="governorate" placeholder="Governorate" required>
+       <textarea name="address" rows="2" placeholder="Full address" required></textarea>
+       <input name="notes" placeholder="Notes (optional)">
+       <div class="msg" id="msg" role="alert"></div>
+       <button class="confirm" id="go" type="submit">Confirm order</button>
+     </form>`;
+}
+function toggle(open) {
+  $('drawer').classList.toggle('open', open);
+  $('veil').classList.toggle('open', open);
+  if (open) renderCart();
+}
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  if (t.dataset.add) {
+    const p = products.find(x => x.code === t.dataset.add), size = $('s-' + p.code).value;
+    const sz = p.sizes.find(s => s.size === size) || {qty: 0}, have = cart.filter(i => i.code === p.code && i.size === size).reduce((a, i) => a + i.qty, 0);
+    if (have >= sz.qty) { note = sz.qty <= 0 ? 'Sorry, this size is out of stock.' : 'Only ' + sz.qty + ' available in size ' + size + '.'; renderCart(); toggle(true); return; }
+    note = '';
+    const hit = cart.find(i => i.code === p.code && i.size === size);
+    hit ? hit.qty++ : cart.push({code: p.code, name: p.name, size, price: p.price, qty: 1});
+    save(); renderCart(); toggle(true);
+  }
+  if (t.dataset.q) {
+    const i = cart[+t.dataset.q], pr = products.find(x => x.code === i.code), sz = pr && pr.sizes.find(s => s.size === i.size);
+    if (+t.dataset.d > 0 && sz && i.qty >= sz.qty) { note = 'Only ' + sz.qty + ' available in size ' + i.size + '.'; renderCart(); return; }
+    note = ''; i.qty += +t.dataset.d;
+    if (i.qty < 1) cart.splice(+t.dataset.q, 1);
+    save(); renderCart();
+  }
+  if (t.id === 'again') { orderDone = null; toggle(false); }
+});
+$('openCart').onclick = () => toggle(true);
+$('closeCart').onclick = $('veil').onclick = () => toggle(false);
+
+document.addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, msg = $('msg'), btn = $('go');
+  const d = Object.fromEntries(new FormData(f));
+  d.phone = d.phone.replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x)).replace(/\D/g, '');
+  const bad = t => { msg.className = 'msg err'; msg.textContent = t; };
+  if (!d.name.trim() || !d.governorate.trim() || !d.address.trim()) return bad('Please fill in all required fields.');
+  if (!/^01[0125]\d{8}$/.test(d.phone)) return bad('Mobile number must be 11 digits starting with 01.');
+  if (!API.startsWith('http')) return bad('The shop is not connected to the sheet yet (API URL).');
+  d.items = cart.map(i => ({code: i.code, size: i.size, qty: i.qty}));
+  btn.disabled = true; msg.className = 'msg'; msg.textContent = 'Placing your order...';
+  try {
+    const r = await fetch(API, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(d)});
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    orderDone = j.orderId; cart = []; save(); renderCart();
+  } catch (err) {
+    bad(err.message && err.message.length < 120 ? err.message : 'Something went wrong, please try again.'); btn.disabled = false;
+    fetch(API).then(r => r.json()).then(j => { if (j.ok) { products = j.products; route(); } }).catch(() => {});
+  }
+});
+
+(async function init() {
+  route(); renderCart();
+  if (API.startsWith('http')) {
+    try { const j = await (await fetch(API)).json(); if (j.ok) { products = j.products; route(); } } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>

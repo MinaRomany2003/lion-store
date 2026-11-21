@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Lion Store Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0a0a0a;--blue:#1448ff;--white:#fff;--soft:#f2f4f8;--line:#dde1e8;--mute:#5b6370;--err:#c0281e;--ok:#0a7a45}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);font-family:'Barlow',system-ui,sans-serif;line-height:1.5}
+h1,h2,h3,.disp{font-family:'Barlow Condensed',sans-serif;font-weight:800}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink)}
+label{display:grid;gap:4px;font-weight:600;font-size:.92rem}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn{border:0;border-radius:8px;padding:8px 16px;font-weight:600;background:var(--ink);color:var(--white)}
+.btn.blue{background:var(--blue)}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}.btn.red{background:var(--err)}
+.btn:disabled{opacity:.6}
+.login{min-height:100vh;display:grid;place-items:center;background:var(--ink);padding:20px}
+.lbox{background:var(--white);border-radius:14px;padding:28px;width:min(380px,100%);display:grid;gap:14px;border-top:6px solid var(--blue)}
+.lbox h1{margin:0;font-size:2.4rem;line-height:1}
+.msg{min-height:1.4em;color:var(--err);font-weight:600}
+header{background:var(--ink);color:var(--white);position:sticky;top:0;z-index:5}
+.bar{max-width:1100px;margin:auto;padding:10px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bar h1{margin:0 auto 0 0;font-size:1.7rem}.bar h1 span{color:var(--blue)}
+.tab{background:transparent;color:#c9ced8;border:0;border-radius:999px;padding:4px 16px;font-weight:600}
+.tab[aria-pressed=true]{background:var(--blue);color:var(--white)}
+main{max-width:1100px;margin:auto;padding:22px 20px 60px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.top h2{margin:0;font-size:2rem}
+.list{display:grid;gap:10px}
+.row{background:var(--white);border-radius:12px;padding:10px 14px;display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center}
+.th{width:64px;height:64px;border-radius:8px;background:var(--soft) center/cover;display:grid;place-items:center;font-size:.7rem;color:var(--mute)}
+.row b{font-size:1.05rem}.sub{color:var(--mute);font-size:.9rem}
+.tag{display:inline-block;border-radius:6px;padding:0 8px;font-size:.8rem;font-weight:600;background:var(--soft)}
+.tag.offer{background:var(--blue);color:var(--white)}.tag.out{background:var(--err);color:var(--white)}
+.acts{display:flex;gap:6px}
+.order{background:var(--white);border-radius:12px;padding:14px 16px;display:grid;gap:6px}
+.oh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.items{white-space:pre-line;background:var(--soft);border-radius:8px;padding:8px 10px;font-size:.92rem}
+.order select{width:auto}
+.empty{text-align:center;color:var(--mute);padding:40px 0}
+.modal{position:fixed;inset:0;background:#000a;display:none;place-items:center;padding:16px;z-index:20;overflow:auto}
+.modal.open{display:grid}
+.mbox{background:var(--white);border-radius:14px;padding:22px;width:min(560px,100%);display:grid;gap:12px}
+.mbox h2{margin:0;font-size:1.8rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;align-items:center;gap:8px}.chk input{width:auto}
+.pv{width:120px;height:120px;border-radius:10px;background:var(--soft) center/cover}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);padding:10px 20px;border-radius:10px;display:none;z-index:30}
+.toast.err{background:var(--err)}
+[hidden]{display:none!important}
+@media(max-width:560px){.row{grid-template-columns:56px 1fr}.acts{grid-column:1/-1}.two{grid-template-columns:1fr}}
+.szr{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<section class="login" id="login">
+  <form class="lbox" id="lf">
+    <h1 class="disp">LION STORE<br>ADMIN</h1>
+    <label>Password<input type="password" id="pw" autocomplete="current-password" required></label>
+    <div class="msg" id="lmsg" role="alert"></div>
+    <button class="btn blue" id="lbtn" type="submit">Sign in</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header><div class="bar">
+    <h1 class="disp">LION<span>STORE</span> Admin</h1>
+    <button class="tab" data-tab="products" aria-pressed="true">Products</button>
+    <button class="tab" data-tab="orders" aria-pressed="false">Orders</button>
+    <button class="btn ghost" id="out" style="color:#fff;border-color:#fff">Sign out</button>
+  </div></header>
+  <main>
+    <div id="pTab">
+      <div class="top"><h2>Products</h2><button class="btn blue" id="addP">Add product</button></div>
+      <div class="list" id="plist"></div>
+    </div>
+    <div id="oTab" hidden>
+      <div class="top"><h2>Orders</h2><button class="btn ghost" id="refresh">Refresh</button></div>
+      <div class="list" id="olist"></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal" id="modal"><form class="mbox" id="pf">
+  <h2 id="mtitle">Add product</h2>
+  <div class="two">
+    <label>Code (also the photo name)<input name="code" required maxlength="30" pattern="[A-Za-z0-9_\-]+" placeholder="AF1-WHITE"></label>
+    <label>Name<input name="name" required></label>
+  </div>
+  <div class="two">
+    <label>Category<select name="category"><option>Copy</option><option>Mirror</option><option>High Copy</option></select></label>
+    <label class="chk"><input name="offer" type="checkbox"> Show in Exclusive Offers</label>
+  </div>
+  <div class="two">
+    <label>Price (EGP)<input name="price" type="number" min="1" required></label>
+    <label>Old price (optional)<input name="oldPrice" type="number" min="0"></label>
+  </div>
+  <div><b>Sizes and stock</b><div id="szs" style="margin-top:6px"></div><button type="button" class="btn ghost" id="addSz">+ Add size</button></div>
+  <label>Photo<input type="file" id="file" accept="image/*"></label>
+  <div class="pv" id="pv"></div>
+  <div class="msg" id="pmsg" role="alert"></div>
+  <div class="acts" style="justify-content:flex-end">
+    <button class="btn ghost" type="button" id="cancel">Cancel</button>
+    <button class="btn blue" id="save" type="submit">Save</button>
+  </div>
+</form></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'PASTE_APPS_SCRIPT_URL_HERE'; // same URL as in index.html
+const STATUSES = ['New', 'Confirmed', 'Shipped', 'Delivered', 'Returned'];
+let pw = '', data = {products: [], orders: []}, editing = null, imgData = '';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => Number(n).toLocaleString('en-US') + ' EGP';
+try { pw = sessionStorage.getItem('pw') || ''; } catch (e) {}
+
+async function api(body) {
+  if (!API.startsWith('http')) throw new Error('Set the API URL in admin.html first.');
+  const r = await fetch(API.trim(), {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify({password: pw, ...body})});
+  const txt = await r.text();
+  let j; try { j = JSON.parse(txt); } catch (e) { throw new Error('The API did not answer correctly. Check: Web app access = Anyone, the URL ends with /exec, and you deployed a New version.'); }
+  if (!j.ok) throw new Error(j.error);
+  return j;
+}
+function toast(t, err) {
+  const el = $('toast'); el.textContent = t; el.className = 'toast' + (err ? ' err' : ''); el.style.display = 'block';
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.style.display = 'none', 3200);
+}
+async function load() {
+  data = await api({action: 'list'});
+  renderProducts(); renderOrders();
+}
+function show(ok) { $('login').hidden = ok; $('app').hidden = !ok; }
+
+$('lf').onsubmit = async e => {
+  e.preventDefault(); pw = $('pw').value; $('lbtn').disabled = true; $('lmsg').textContent = '';
+  try { await load(); try { sessionStorage.setItem('pw', pw); } catch (x) {} show(true); }
+  catch (err) { $('lmsg').textContent = err.message; pw = ''; }
+  $('lbtn').disabled = false;
+};
+$('out').onclick = () => { pw = ''; try { sessionStorage.removeItem('pw'); } catch (e) {} $('pw').value = ''; show(false); };
+
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-pressed', x === b));
+  $('pTab').hidden = b.dataset.tab !== 'products'; $('oTab').hidden = b.dataset.tab !== 'orders';
+});
+$('refresh').onclick = () => load().then(() => toast('Updated')).catch(e => toast(e.message, 1));
+
+function renderProducts() {
+  $('plist').innerHTML = data.products.length ? data.products.map(p => `
+    <div class="row">
+      <div class="th" ${p.image ? `style="background-image:url('${esc(p.image)}')"` : ''}>${p.image ? '' : 'No photo'}</div>
+      <div><b>${esc(p.name)}</b> <span class="sub">${esc(p.code)}</span><br>
+        <span class="sub">${esc(p.category)} · ${money(p.price)}${p.oldPrice ? ` (was ${money(p.oldPrice)})` : ''} · ${p.sizes.map(s => esc(s.size) + '×' + s.qty).join('  ')}</span><br>
+        <span class="tag ${p.stock ? '' : 'out'}">${p.stock ? 'Stock ' + p.stock : 'Out of stock'}</span>
+        ${p.offer ? '<span class="tag offer">Offer</span>' : ''}</div>
+      <div class="acts"><button class="btn ghost" data-edit="${esc(p.code)}">Edit</button><button class="btn red" data-del="${esc(p.code)}">Delete</button></div>
+    </div>`).join('') : '<p class="empty">No products yet. Add your first one.</p>';
+}
+function renderOrders() {
+  $('olist').innerHTML = data.orders.length ? data.orders.map(o => `
+    <div class="order">
+      <div class="oh"><b>${esc(o.id)}</b><span class="sub">${esc(new Date(o.date).toLocaleString('en-GB'))}</span>
+        <select data-st="${esc(o.id)}" aria-label="Status of ${esc(o.id)}">${STATUSES.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+      <div>${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br><span class="sub">${esc(o.governorate)} — ${esc(o.address)}</span></div>
+      <div class="items">${esc(o.items)}</div>
+      <div class="oh"><span class="sub">${esc(o.notes || '')}</span><b>${money(o.total)}</b></div>
+    </div>`).join('') : '<p class="empty">No orders yet.</p>';
+}
+
+function szRows(list) {
+  $('szs').innerHTML = list.map(s => `<div class="szr"><input class="sn" placeholder="Size (e.g. 42)" maxlength="10" value="${esc(s.size)}"><input class="sq" type="number" min="0" placeholder="Qty" value="${esc(s.qty)}"><button type="button" class="btn ghost" data-rm aria-label="Remove size">×</button></div>`).join('');
+}
+$('addSz').onclick = () => { const cur = [...document.querySelectorAll('.szr')].map(r => ({size: r.querySelector('.sn').value, qty: r.querySelector('.sq').value})); cur.push({size: '', qty: ''}); szRows(cur); };
+function openForm(p) {
+  editing = p; imgData = ''; const f = $('pf');
+  f.reset(); $('mtitle').textContent = p ? 'Edit product' : 'Add product'; $('pmsg').textContent = '';
+  f.code.disabled = !!p;
+  if (p) { f.code.value = p.code; f.name.value = p.name; f.category.value = p.category; f.price.value = p.price; f.oldPrice.value = p.oldPrice || ''; f.offer.checked = p.offer; }
+  szRows(p ? p.sizes : [{size: '', qty: ''}]);
+  $('pv').style.backgroundImage = p && p.image ? `url('${p.image}')` : '';
+  $('modal').classList.add('open');
+}
+$('addP').onclick = () => openForm(null);
+$('cancel').onclick = () => $('modal').classList.remove('open');
+
+$('file').onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    const k = Math.min(1, 900 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+    c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', .82); imgData = url.split(',')[1]; $('pv').style.backgroundImage = `url('${url}')`;
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(file);
+};
+
+$('pf').onsubmit = async e => {
+  e.preventDefault(); const f = e.target, b = $('save'); b.disabled = true; $('pmsg').textContent = 'Saving...';
+  const product = {code: editing ? editing.code : f.code.value.trim(), name: f.name.value.trim(), category: f.category.value,
+    sizes: [...document.querySelectorAll('.szr')].map(r => ({size: r.querySelector('.sn').value.trim(), qty: r.querySelector('.sq').value || 0})).filter(s => s.size),
+    price: f.price.value, oldPrice: f.oldPrice.value, offer: f.offer.checked};
+  if (imgData) product.imageBase64 = imgData;
+  try { await api({action: 'save', product}); await load(); $('modal').classList.remove('open'); toast('Saved'); }
+  catch (err) { $('pmsg').textContent = err.message; }
+  b.disabled = false;
+};
+
+document.addEventListener('click', async e => {
+  const t = e.target;
+  if (t.dataset.rm !== undefined) { t.closest('.szr').remove(); return; }
+  if (t.dataset.edit) openForm(data.products.find(p => p.code === t.dataset.edit));
+  if (t.dataset.del && confirm('Delete ' + t.dataset.del + '? This cannot be undone.')) {
+    try { await api({action: 'delete', code: t.dataset.del}); await load(); toast('Deleted'); } catch (err) { toast(err.message, 1); }
+  }
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.dataset.st) { try { await api({action: 'status', orderId: t.dataset.st, status: t.value}); toast('Status updated'); } catch (err) { toast(err.message, 1); load(); } }
+});
+
+(async () => { if (pw) { try { await load(); show(true); } catch (e) { pw = ''; } } })();
+</script>
+</body>
+</html>
