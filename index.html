@@ -94,11 +94,7 @@ const PAGES = [
   {id:'high-copy',label:'High Copy', cat:'High Copy'}
 ];
 // Demo products (shown until the API URL is set)
-let products = [
-  {code:'C001',name:'Sample Model 1',category:'Copy',price:550,oldPrice:650,sizes:['40','41','42','43'],offer:true},
-  {code:'M001',name:'Sample Model 2',category:'Mirror',price:950,oldPrice:0,sizes:['40','41','42','43','44'],offer:false},
-  {code:'H001',name:'Sample Model 3',category:'High Copy',price:1050,oldPrice:1250,sizes:['41','42','43'],offer:true}
-];
+let products = [];
 let cart = [], orderDone = null, note = '';
 try { cart = JSON.parse(localStorage.getItem('cart') || '[]'); } catch (e) {}
 
